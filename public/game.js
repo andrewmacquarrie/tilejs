@@ -2,6 +2,8 @@ function Game() {
 	var me = this;
 	this.imageRepository;
 	this.DrawInterval = 25;
+	this.character_x = 0;
+	this.character_y = 0;
 
 	this.ImagesLoadedCallback=function (loaded_images) {
 		me.imageRepository = loaded_images;
@@ -12,29 +14,37 @@ function Game() {
 		me.MoveAndDraw();
 	}
 
-	var size_x = 600;
-	var size_y = 300;
-	var mushroom_x = 10;
-	var mushroom_y = 10;
-	var x_direction = 1;
-	var y_direction = 1;
+	var map = [[0,1,0,1,1],[1,0,1,0,1],[1,0,1,0,1],[0,1,0,1,1]];
+	var tile_height = 60;
+	var tile_width = 60;
+	var map_size_x = 600;
+	var map_size_y = 300;
+	
 	this.MoveAndDraw = function (){	
 		var context = document.getElementById('stage').getContext('2d');
-		context.clearRect(0,0,size_x,size_y);
-		context.drawImage(me.imageRepository[0],mushroom_x,mushroom_y,80,90);
-		context.drawImage(me.imageRepository[1],(size_x-mushroom_x),(size_y-mushroom_y),80,90);
-		context.drawImage(me.imageRepository[2],(size_x-mushroom_x),(mushroom_y),80,90);
-	
-		if((mushroom_x > size_x - 80) || (mushroom_x < 1)) {
-			x_direction = x_direction * -1;
+		context.clearRect(0,0,map_size_x,map_size_y);
+		
+		var row=0;
+		for (row=0;row<map.length;row++) {
+			var col = 0;
+		  for(col=0;col<map[row].length;col++){
+				var tile = map[row][col];
+				context.drawImage(me.imageRepository[tile],row*tile_width,col*tile_height,tile_width,tile_height);
+			}
 		}
-
-	
-		if((mushroom_y > size_y - 90) || (mushroom_y < 1)) {
-			y_direction = y_direction * -1;
-		}
-
-		mushroom_x = (mushroom_x + x_direction);
-		mushroom_y = (mushroom_y + y_direction);
+		
+		context.drawImage(me.imageRepository[2],me.character_x,me.character_y,tile_width,tile_height);
 	}
+	
+	$(document).keypress(function(e){
+		var keyCode = e.keyCode || e.which;
+	 	var arrow = {left: 37, up: 38, right: 39, down: 40 };
+
+	  if (keyCode == arrow.left) { me.character_x = me.character_x - tile_width; }
+	  if (keyCode == arrow.right) { me.character_x = me.character_x + tile_width; }
+		if (keyCode == arrow.up) { me.character_y = me.character_y - tile_height; }
+		if (keyCode == arrow.down) { me.character_y = me.character_y + tile_height; }
+	  
+		return false;
+	});
 }
