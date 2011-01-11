@@ -96,23 +96,61 @@ function Game() {
     var map_y = Math.floor(y/tile_height);
     
     var destination = {x:map_x,y:map_y,count:0};
-    path.push(destination);
     pathfind(destination);
     
-    //plotPath();
-    
+    var p = startPlotPath(destination);
+    debugger;
 	  return false;
 	});
 	
 	var path = [];
 	
-	function plotPath (centre) {
-	  var nextTile = fileLowestCount(centre)
+	function startPlotPath(destination){
+	  var origin = {x:me.character_x, y:me.character_y};
+	  path.splice(indexInPath(origin),1);
+	  return origin + plotPath(origin,destination);
+	}
+	
+	function plotPath (centre, destination) {
+	  var nextTile = getNextTile(centre);
+	  if(nextTile.x == destination.x && nextTile.y == destination.y){
+	    return nextTile;
+	  }
+	  return nextTile + plotPath(nextTile,destination);
   }
 	
-	function fileLowestCount(centre){
+	function getNextTile(centre){
 	  var adjacentTiles = [];
-	  return adjacentTiles.sort(sortByCount);
+	  var i=0;
+		for (i=0;i<path.length;i++) { 
+  	  if(path[i].x == centre.x+1 && path[i].y == centre.y){
+        adjacentTiles.push(path[i]);
+      }
+      if(path[i].x == centre.x-1 && path[i].y == centre.y){
+        adjacentTiles.push(path[i]);
+      }
+      if(path[i].x == centre.x && path[i].y == centre.y+1){
+        adjacentTiles.push(path[i]);
+      }
+      if(path[i].x == centre.x && path[i].y == centre.y-1){
+        adjacentTiles.push(path[i]);
+      }
+    }
+    debugger;
+	  var bestTile = adjacentTiles.sort(sortByCount)[0];
+	  path.splice(indexInPath(bestTile),1);
+	  return bestTile;
+	}
+	
+	function indexInPath(tile){
+	  var i = 0;
+	  for(i=0;i<path.length;i++){
+		  if(path[i].x == tile.x && path[i].y == tile.y)
+		  {
+		    return i;
+		  }
+		}
+		return null;
 	}
 	
 	function sortByCount(a, b){
@@ -120,6 +158,7 @@ function Game() {
   }
 	
 	function pathfind (centre) {
+	  path.push(centre)
 	  var list = adjacentTiles(centre);
 	  
 	  var i = 0;
@@ -127,7 +166,6 @@ function Game() {
 		  if(shouldKeep(list[i])){
 		    path.push(list[i])
 		    if(list[i].x == me.character_x && list[i].y == me.character_y){
-		      debugger;
 		      return;
 		    }
 		  }
@@ -157,26 +195,18 @@ function Game() {
   }
   
   function adjacentTiles(tile){
-    var list = adjacentTileList(tile);
-    for (i=0;i<list.length;i++) {
-		  list[i].count = 0;
-		}
-    return list;
-  }
-  
-  function adjacentTileList(tile){
     var list = [];
-    if(tile.x+1<x_tiles){
-      list.push({x:tile.x+1,y:tile.y});
+    if(tile.x+1<x_tiles-1){
+      list.push({x:tile.x+1,y:tile.y,count:tile.count+1});
     }
     if(tile.x>0){
-      list.push({x:tile.x-1,y:tile.y});
+      list.push({x:tile.x-1,y:tile.y,count:tile.count+1});
     }
-    if(tile.y<y_tiles){
-      list.push({x:tile.x,y:tile.y+1});
+    if(tile.y<y_tiles-1){
+      list.push({x:tile.x,y:tile.y+1,count:tile.count+1});
     }
     if(tile.y>0){
-      list.push({x:tile.x,y:tile.y-1});
+      list.push({x:tile.x,y:tile.y-1,count:tile.count+1});
     }
     return list;
   }
