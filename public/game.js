@@ -70,4 +70,18 @@ function Game() {
 	
 		return false;
 	});
+	
+	$(document).click(function(e){
+	  var offset = $("#stage").offset();
+	  var x = e.pageX - offset.top;
+    var y = e.pageY - offset.left;
+    
+    var map_x = Math.floor(x/tile_width);
+    var map_y = Math.floor(y/tile_height)
+    
+    me.character_y = map_y;
+    me.character_x = map_x;
+    
+	  return false;
+	});
 }
