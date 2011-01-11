@@ -1,9 +1,9 @@
 function Game() {
 	var me = this;
 	this.imageRepository;
-	this.DrawInterval = 25;
-	this.character_x = 1;
-	this.character_y = 1;
+	this.DrawInterval = 50;
+	this.character_x = 0;
+	this.character_y = 0;
 
 	this.ImagesLoadedCallback=function (loaded_images) {
 		me.imageRepository = loaded_images;
@@ -15,33 +15,49 @@ function Game() {
 	}
 
 	var map =  [];
-	map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+  map.push([0,0,0]);
+  map.push([0,1,0]);
+  map.push([0,0,0]);
+	// map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+	//   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
+	//   map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
+	//   map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 	var walk_map = [];
-	walk_map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
-	walk_map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+	walk_map.push([1,1,1]);
+  walk_map.push([1,0,1]);
+  walk_map.push([1,1,1]);
+	// walk_map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,1,1,1,1,1,1,1,1,1,1,1,1,1,0]);
+	//   walk_map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 	var tile_height = 40;
 	var tile_width = 40;
 	var map_size_x = 600;
 	var map_size_y = 800;
+	var x_tiles = map.length;
+	var y_tiles = map[0].length;
+	var route = [];
 	
 	this.MoveAndDraw = function (){	
+	  if (route.length > 0){
+	    var pos = route.pop();
+	    
+      me.character_y = pos.x;
+      me.character_x = pos.y;
+	  }
+	  
 		var context = document.getElementById('stage').getContext('2d');
 		context.clearRect(0,0,map_size_x,map_size_y);
 		
@@ -77,11 +93,92 @@ function Game() {
     var y = e.pageY - offset.left;
     
     var map_x = Math.floor(x/tile_width);
-    var map_y = Math.floor(y/tile_height)
+    var map_y = Math.floor(y/tile_height);
     
-    me.character_y = map_y;
-    me.character_x = map_x;
+    var destination = {x:map_x,y:map_y,count:0};
+    path.push(destination);
+    pathfind(destination);
+    
+    //plotPath();
     
 	  return false;
 	});
+	
+	var path = [];
+	
+	function plotPath (centre) {
+	  var nextTile = fileLowestCount(centre)
+  }
+	
+	function fileLowestCount(centre){
+	  var adjacentTiles = [];
+	  return adjacentTiles.sort(sortByCount);
+	}
+	
+	function sortByCount(a, b){
+    return (a.count - b.count) //causes an array to be sorted numerically and ascending
+  }
+	
+	function pathfind (centre) {
+	  var list = adjacentTiles(centre);
+	  
+	  var i = 0;
+	  for(i=0;i<list.length;i++){
+		  if(shouldKeep(list[i])){
+		    path.push(list[i])
+		    if(list[i].x == me.character_x && list[i].y == me.character_y){
+		      debugger;
+		      return;
+		    }
+		  }
+		}
+		
+		if(path.length > 0){
+		  var next = path[0];
+		  path.shift();
+		  pathfind(next);
+		}
+  }
+  
+  function shouldKeep(tile){
+    // alert('should keep');
+    //     if(!walk_map[tile.x, tile.y]){
+    //       return false;
+    //     }
+    var i=0;
+		for (i=0;i<path.length;i++) {
+		  t = path[i];
+		  if(t.x == tile.x && t.y == tile.y && t.count <= tile.count)
+		  {
+		    return false;
+		  }
+		}
+		return true;
+  }
+  
+  function adjacentTiles(tile){
+    var list = adjacentTileList(tile);
+    for (i=0;i<list.length;i++) {
+		  list[i].count = 0;
+		}
+    return list;
+  }
+  
+  function adjacentTileList(tile){
+    var list = [];
+    if(tile.x+1<x_tiles){
+      list.push({x:tile.x+1,y:tile.y});
+    }
+    if(tile.x>0){
+      list.push({x:tile.x-1,y:tile.y});
+    }
+    if(tile.y<y_tiles){
+      list.push({x:tile.x,y:tile.y+1});
+    }
+    if(tile.y>0){
+      list.push({x:tile.x,y:tile.y-1});
+    }
+    return list;
+  }
+  
 }
