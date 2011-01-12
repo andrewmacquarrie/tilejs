@@ -1,7 +1,7 @@
 function Game() {
 	var me = this;
 	this.imageRepository;
-	this.DrawInterval = 50;
+	this.DrawInterval = 150;
 	this.character_x = 0;
 	this.character_y = 0;
 
@@ -52,8 +52,7 @@ function Game() {
 	
 	this.MoveAndDraw = function (){	
 	  if (route.length > 0){
-	    var pos = route.pop();
-	    
+	    var pos = route.shift();
       me.character_y = pos.x;
       me.character_x = pos.y;
 	  }
@@ -99,7 +98,7 @@ function Game() {
     pathfind(destination);
     
     var p = startPlotPath(destination);
-    debugger;
+    route = p;
 	  return false;
 	});
 	
@@ -108,7 +107,7 @@ function Game() {
 	function startPlotPath(destination){
 	  var origin = {x:me.character_x, y:me.character_y};
 	  path.splice(indexInPath(origin),1);
-	  return origin + plotPath(origin,destination);
+	  return [origin].concat(plotPath(origin,destination));
 	}
 	
 	function plotPath (centre, destination) {
@@ -116,7 +115,7 @@ function Game() {
 	  if(nextTile.x == destination.x && nextTile.y == destination.y){
 	    return nextTile;
 	  }
-	  return nextTile + plotPath(nextTile,destination);
+	  return [nextTile].concat(plotPath(nextTile,destination));
   }
 	
 	function getNextTile(centre){
@@ -136,8 +135,8 @@ function Game() {
         adjacentTiles.push(path[i]);
       }
     }
-    debugger;
 	  var bestTile = adjacentTiles.sort(sortByCount)[0];
+	  var removing= indexInPath(bestTile);
 	  path.splice(indexInPath(bestTile),1);
 	  return bestTile;
 	}
@@ -180,7 +179,7 @@ function Game() {
   
   function shouldKeep(tile){
     // alert('should keep');
-    //     if(!walk_map[tile.x, tile.y]){
+    // if(!walk_map[tile.x, tile.y]){
     //       return false;
     //     }
     var i=0;
