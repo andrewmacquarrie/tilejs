@@ -20,7 +20,7 @@ function Game() {
   // map.push([0,0,0]);
 	map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
   map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
-  map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
+  map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
   map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
   map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
   map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
@@ -34,7 +34,7 @@ function Game() {
 	//   walk_map.push([1,1,1]);
 	walk_map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
-  walk_map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
+  walk_map.push([0,1,1,1,1,1,1,0,1,1,1,1,1,1,0]);
   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
   walk_map.push([0,1,1,1,1,1,1,0,1,1,1,0,1,1,0]);
@@ -46,8 +46,7 @@ function Game() {
 	var tile_width = 40;
 	var map_size_x = 600;
 	var map_size_y = 800;
-	var x_tiles = map.length;
-	var y_tiles = map[0].length;
+
 	var route = [];
 	
 	this.MoveAndDraw = function (){	
@@ -94,120 +93,15 @@ function Game() {
     var map_x = Math.floor(x/tile_width);
     var map_y = Math.floor(y/tile_height);
     
-    var destination = {x:map_x,y:map_y,count:0};
-    pathfind(destination);
-    
-    var p = startPlotPath(destination);
-    route = p;
+    var destination = {x:map_x, y:map_y, count:0};
+		var origin = {x:me.character_x, y:me.character_y};
+		var pathfinder = new Pathfinder(walk_map);
+		var p = pathfinder.findPath(origin,destination)
+		route = p;
 	  return false;
 	});
 	
 	var path = [];
-	
-	function startPlotPath(destination){
-	  var origin = {x:me.character_x, y:me.character_y};
-	  path.splice(indexInPath(origin),1);
-	  return [origin].concat(plotPath(origin,destination));
-	}
-	
-	function plotPath (centre, destination) {
-	  var nextTile = getNextTile(centre);
-	  if(nextTile.x == destination.x && nextTile.y == destination.y){
-	    return nextTile;
-	  }
-	  return [nextTile].concat(plotPath(nextTile,destination));
-  }
-	
-	function getNextTile(centre){
-	  var adjacentTiles = [];
-	  var i=0;
-		for (i=0;i<path.length;i++) { 
-  	  if(path[i].x == centre.x+1 && path[i].y == centre.y){
-        adjacentTiles.push(path[i]);
-      }
-      if(path[i].x == centre.x-1 && path[i].y == centre.y){
-        adjacentTiles.push(path[i]);
-      }
-      if(path[i].x == centre.x && path[i].y == centre.y+1){
-        adjacentTiles.push(path[i]);
-      }
-      if(path[i].x == centre.x && path[i].y == centre.y-1){
-        adjacentTiles.push(path[i]);
-      }
-    }
-	  var bestTile = adjacentTiles.sort(sortByCount)[0];
-	  var removing= indexInPath(bestTile);
-	  path.splice(indexInPath(bestTile),1);
-	  return bestTile;
-	}
-	
-	function indexInPath(tile){
-	  var i = 0;
-	  for(i=0;i<path.length;i++){
-		  if(path[i].x == tile.x && path[i].y == tile.y)
-		  {
-		    return i;
-		  }
-		}
-		return null;
-	}
-	
-	function sortByCount(a, b){
-    return (a.count - b.count)
-  }
-	
-	function pathfind (centre) {
-	  path.push(centre)
-	  var list = adjacentTiles(centre);
-	  
-	  var i = 0;
-	  for(i=0;i<list.length;i++){
-		  if(shouldKeep(list[i])){
-		    path.push(list[i])
-		    if(list[i].x == me.character_x && list[i].y == me.character_y){
-		      return;
-		    }
-		  }
-		}
-		
-		if(path.length > 0){
-		  var next = path[0];
-		  path.shift();
-		  pathfind(next);
-		}
-  }
-  
-  function shouldKeep(tile){
-    // alert('should keep');
-    if(walk_map[tile.y][tile.x] == 0){
-    	return false;
-    }
-    var i=0;
-		for (i=0;i<path.length;i++) {
-		  t = path[i];
-		  if(t.x == tile.x && t.y == tile.y && t.count <= tile.count)
-		  {
-		    return false;
-		  }
-		}
-		return true;
-  }
-  
-  function adjacentTiles(tile){
-    var list = [];
-    if(tile.x+1<x_tiles-1){
-      list.push({x:tile.x+1,y:tile.y,count:tile.count+1});
-    }
-    if(tile.x>0){
-      list.push({x:tile.x-1,y:tile.y,count:tile.count+1});
-    }
-    if(tile.y<y_tiles-1){
-      list.push({x:tile.x,y:tile.y+1,count:tile.count+1});
-    }
-    if(tile.y>0){
-      list.push({x:tile.x,y:tile.y-1,count:tile.count+1});
-    }
-    return list;
-  }
+
   
 }
